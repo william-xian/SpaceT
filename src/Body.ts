@@ -1,7 +1,7 @@
 import * as THREE from "three"
+import {C} from './C'
 
 export class Body {
-    static G = 6.67259e-11;
 
     mother: Body
     m: number; r: number; w: number; a: number; e: number; thetaZ: number;
@@ -16,7 +16,7 @@ export class Body {
         this.a = a; //轨道长半轴
         this.e = e; //离心率
         this.b = Math.sqrt(1 - e * e) * a; //轨道短半轴
-        this.k = 4 * Math.PI * Math.PI / Body.G * m;
+        this.k = 4 * Math.PI * Math.PI / C.G * m;
         this.t = 0;
         this.w = w; //围绕母星角速度，TOOD 角速度是恒定吗？
         this.thetaZ = thetaZ; // 轨道与黄道面夹角
@@ -31,12 +31,13 @@ export class Body {
             this.orbit = this.createOrbit();
             scene.add(this.orbit);
             const mbp = this.mother.body.position;
-            this.body.position.x = Math.sin(this.w * time) * this.a + mbp.x;
-            this.body.position.y = Math.cos(this.w * time) * this.b + mbp.y;
-            this.body.position.z = 0 + mbp.z;
+            this.body.position.x = Math.cos(this.thetaZ)*Math.cos(this.w * time) * this.a + mbp.x;
+            this.body.position.y = Math.cos(this.thetaZ)*Math.sin(this.w * time) * this.b + mbp.y;
+            this.body.position.z = Math.sin(this.thetaZ)*this.a + mbp.z;
         } else {
-            this.body.position.x = Math.sin(this.w * time) * this.a;
-            this.body.position.y = Math.cos(this.w * time) * this.b;
+            this.body.position.x = Math.cos(this.thetaZ)*Math.cos(this.w * time) * this.a;
+            this.body.position.y = Math.cos(this.thetaZ)*Math.sin(this.w * time) * this.b;
+            this.body.position.z = Math.sin(this.thetaZ)*this.a;
         }
         this.moons.forEach((moon: Body) => {
             moon.repaint(scene, time);
@@ -53,11 +54,11 @@ export class Body {
     private createOrbit() {
         if (this.mother) {
             const mbp = this.mother.body.position;
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const material = new THREE.MeshBasicMaterial({ color: 0x808080 });
             var points = [];
             for (var i = 0; i < 360; i++) {
                 var alpha = i * Math.PI * 2 / 360;
-                points.push(new THREE.Vector3(Math.sin(alpha) * this.a + mbp.x, Math.cos(alpha) * this.b + mbp.y, 0 + mbp.z));
+                points.push(new THREE.Vector3(Math.cos(this.thetaZ)*Math.cos(alpha) * this.a + mbp.x, Math.cos(this.thetaZ)*Math.sin(alpha) * this.b + mbp.y, Math.sin(this.thetaZ)*this.a + mbp.z));
             }
             points.push(points[0]);
             const geometry = new THREE.BufferGeometry().setFromPoints(points);

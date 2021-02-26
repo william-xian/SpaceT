@@ -1,3 +1,3 @@
-import ThreeScee from "./scene"
+import SpaceScene from "./SpaceScene"
 
-new ThreeScee()
+new SpaceScene();
