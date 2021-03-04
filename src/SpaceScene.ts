@@ -12,7 +12,7 @@ export default class SpaceScene {
     beta: number;
     constructor() {
         this.scene = new THREE.Scene()
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1.0e0, 1.0e8)
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1.0e0, 1.0e11)
         this.renderer = new THREE.WebGLRenderer()
         this.leftPressed = false;
         this.time = 0;
@@ -21,10 +21,9 @@ export default class SpaceScene {
         this.init()
     }
     private init() {
-        let fR = 1.0e-6;
-        let fV = 1.0e-6 * 100;
-        let fW = Math.PI / 18;
-        this.camera.position.set(1.49e11 * fR, 0, 0)
+        this.camera.position.set(-5.474123206715784e-27,-8.93992163377569e-11, -4.60e5)
+        this.alpha = Math.PI/2;
+        this.beta = Math.PI/2;
         this.updateLookAt();
         this.renderer.setClearColor(0x222222)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
@@ -45,19 +44,18 @@ export default class SpaceScene {
         mover.addEventListener('touchend', this.onMoverTouchEnd);
         mover.addEventListener('touchmove', this.onMoverTouchMove);
 
-        let sun = new Body(33340, 6.96e8 * fV * 0.01, 0, 0, 0, 0);
+        let sun = new Body(1.9891e30, 6.96e8, 0, 0, 0);
 
-        sun.addMoon(new Body(0.055, 2.44e6 * fV, 5.79e10 * fR, 0, 7.005 * C.A2PI, fW / 7.60));
-        sun.addMoon(new Body(0.815, 6.053e6 * fV, 1.08e11 * fR, 0, 3.395 * C.A2PI, fW / 19.4));
-        sun.addMoon(new Body(1, 6.378e6 * fV, 1.49e11 * fR, 0.0034, 0, fW / 31.6));
-        sun.addMoon(new Body(0.107, 3.397e6 * fV, 2.28e11 * fR, 0.0052, 1.85 * C.A2PI, fW / 59.4));
-        sun.addMoon(new Body(317.832, 7.1492e7 * fV, 7.78e11 * fR, 0.0648, 1.303 * C.A2PI, fW / 374));
-        sun.addMoon(new Body(95.16, 6.0268e7 * fV, 1.43e12 * fR, 0.1076, 2.489 * C.A2PI, fW / 930));
-        sun.addMoon(new Body(14.54, 2.5559e7 * fV, 2.87e12 * fR, 0.023, 0.773 * C.A2PI, fW / 2660));
-        sun.addMoon(new Body(17.15, 2.4764e7 * fV, 4.50e12 * fR, 0.017, 1.770 * C.A2PI, fW / 5200));
-
+        sun.addMoon(new Body(3.3022e23, 2.44e6, 5.79e10, 0, 7.005 * C.A2PI));
+        sun.addMoon(new Body(4.869e24, 6.053e6, 1.08e11, 0, 3.395 * C.A2PI));
+        sun.addMoon(new Body(5.965e24, 6.378e6, 1.49e11, 0.0034, 0));
+        sun.addMoon(new Body(6.6219e23, 3.397e6, 2.28e11, 0.052, 1.85 * C.A2PI));
+        sun.addMoon(new Body(1.90e27, 7.1492e7, 7.78e11, 0.0648, 1.303 * C.A2PI));
+        sun.addMoon(new Body(5.6834e26, 6.0268e7, 1.43e12, 0.1076, 2.489 * C.A2PI));
+        sun.addMoon(new Body(8.6810e25, 2.5559e7, 2.87e12, 0.023, 0.773 * C.A2PI));
+        sun.addMoon(new Body(1.0247e26, 2.4764e7, 4.50e12, 0.017, 1.770 * C.A2PI));
         let earth = sun.moons[2];
-        let moon = new Body(7.342e22, 1.738e6 * fV, 3.8443e8 * fR, 0.0549, 0, fW / 15);
+        let moon = new Body(7.342e22, 1.738e6, 3.8443e8, 0.0549, 0);
         earth.addMoon(moon);
 
         this.body = sun;
@@ -65,9 +63,16 @@ export default class SpaceScene {
         this.animate()
     }
 
+    private createSphere(r: number, color: number) {
+        var sphereGgeometry = new THREE.SphereGeometry(r , 32, 32);
+        var sphereMaterial = new THREE.MeshBasicMaterial({ color: color });
+        var sphere = new THREE.Mesh(sphereGgeometry, sphereMaterial);
+        return sphere;
+    }
+
     private updateLookAt() {
         let cp = this.camera.position;
-        let unit = 1.0e3;
+        let unit = 1.0e4;
         let lookPoint = new THREE.Vector3(Math.cos(this.beta) * Math.cos(this.alpha) * unit + cp.x, Math.cos(this.beta) * Math.sin(this.alpha) * unit + cp.y, Math.sin(this.beta) * unit + cp.z);
         this.camera.lookAt(lookPoint);
     }
@@ -168,10 +173,11 @@ export default class SpaceScene {
         this.updateLookAt();
         this.camera.updateProjectionMatrix();
         this.renderer.render(this.scene, this.camera);
+        console.log(this.camera.position);
     }
     private render() {
         this.body.repaint(this.scene, this.time);
-        //this.time++;
+        this.time++;
         this.renderer.render(this.scene, this.camera)
     }
     private animate = () => {
