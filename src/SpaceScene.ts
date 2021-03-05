@@ -12,7 +12,7 @@ export default class SpaceScene {
     beta: number;
     constructor() {
         this.scene = new THREE.Scene()
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1.0e0, 1.0e11)
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1.0e0, 1.0e100)
         this.renderer = new THREE.WebGLRenderer()
         this.leftPressed = false;
         this.time = 0;
@@ -21,9 +21,9 @@ export default class SpaceScene {
         this.init()
     }
     private init() {
-        this.camera.position.set(-5.474123206715784e-27,-8.93992163377569e-11, -4.60e5)
-        this.alpha = Math.PI/2;
-        this.beta = Math.PI/2;
+        this.camera.position.set(0, 0, -4.60e11)
+        this.alpha = Math.PI / 2;
+        this.beta = Math.PI / 2;
         this.updateLookAt();
         this.renderer.setClearColor(0x222222)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
@@ -34,7 +34,9 @@ export default class SpaceScene {
         window.addEventListener('mousedown', this.onMousedown, false);
         window.addEventListener('mouseup', this.onMouseup, false);
         window.addEventListener('keydown', this.onKeydown, false);
-        document.body.appendChild(this.renderer.domElement);
+
+        let scene = document.getElementById('scene');
+        scene.appendChild(this.renderer.domElement);
         let viewer = document.getElementById('viewer');
         let mover = document.getElementById('mover');
         viewer.addEventListener('touchstart', this.onViewerTouchStart);
@@ -44,30 +46,24 @@ export default class SpaceScene {
         mover.addEventListener('touchend', this.onMoverTouchEnd);
         mover.addEventListener('touchmove', this.onMoverTouchMove);
 
-        let sun = new Body(1.9891e30, 6.96e8, 0, 0, 0);
+        let sun = new Body(1.9891e30, 6.96e8, 0, 0, 0, 0);
 
-        sun.addMoon(new Body(3.3022e23, 2.44e6, 5.79e10, 0, 7.005 * C.A2PI));
-        sun.addMoon(new Body(4.869e24, 6.053e6, 1.08e11, 0, 3.395 * C.A2PI));
-        sun.addMoon(new Body(5.965e24, 6.378e6, 1.49e11, 0.0034, 0));
-        sun.addMoon(new Body(6.6219e23, 3.397e6, 2.28e11, 0.052, 1.85 * C.A2PI));
-        sun.addMoon(new Body(1.90e27, 7.1492e7, 7.78e11, 0.0648, 1.303 * C.A2PI));
-        sun.addMoon(new Body(5.6834e26, 6.0268e7, 1.43e12, 0.1076, 2.489 * C.A2PI));
-        sun.addMoon(new Body(8.6810e25, 2.5559e7, 2.87e12, 0.023, 0.773 * C.A2PI));
-        sun.addMoon(new Body(1.0247e26, 2.4764e7, 4.50e12, 0.017, 1.770 * C.A2PI));
+        sun.addMoon(new Body(3.3022e23, 2.44e6, 5.79e10, 0, 7.005 * C.A2PI, 0));
+        sun.addMoon(new Body(4.869e24, 6.053e6, 1.08e11, 0, 3.395 * C.A2PI, 0));
+        sun.addMoon(new Body(5.965e24, 6.378e6, 1.49e11, 0.0034, 0, 0));
+        sun.addMoon(new Body(6.6219e23, 3.397e6, 2.28e11, 0.052, 1.85 * C.A2PI, 0));
+        sun.addMoon(new Body(1.90e27, 7.1492e7, 7.78e11, 0.0648, 1.303 * C.A2PI, 0));
+        sun.addMoon(new Body(5.6834e26, 6.0268e7, 1.43e12, 0.1076, 2.489 * C.A2PI, 0));
+        sun.addMoon(new Body(8.6810e25, 2.5559e7, 2.87e12, 0.023, 0.773 * C.A2PI, 0));
+        sun.addMoon(new Body(1.0247e26, 2.4764e7, 4.50e12, 0.017, 1.770 * C.A2PI, 0));
+        sun.addMoon(new Body(1.0e15, 1.1e7, 2.682e12, 0.967, 162.3 * C.A2PI, 0));
         let earth = sun.moons[2];
-        let moon = new Body(7.342e22, 1.738e6, 3.8443e8, 0.0549, 0);
+        let moon = new Body(7.342e22, 1.738e6, 3.8443e9, 0.0549, 0, 0);
         earth.addMoon(moon);
 
         this.body = sun;
         this.body.paint(this.scene, this.time);
         this.animate()
-    }
-
-    private createSphere(r: number, color: number) {
-        var sphereGgeometry = new THREE.SphereGeometry(r , 32, 32);
-        var sphereMaterial = new THREE.MeshBasicMaterial({ color: color });
-        var sphere = new THREE.Mesh(sphereGgeometry, sphereMaterial);
-        return sphere;
     }
 
     private updateLookAt() {
