@@ -56,13 +56,14 @@ export default class SpaceScene {
         sun.addMoon(new Body(5.6834e26, 6.0268e7, 1.43e12, 0.1076, 2.489 * C.A2PI, 0));
         sun.addMoon(new Body(8.6810e25, 2.5559e7, 2.87e12, 0.023, 0.773 * C.A2PI, 0));
         sun.addMoon(new Body(1.0247e26, 2.4764e7, 4.50e12, 0.017, 1.770 * C.A2PI, 0));
-        sun.addMoon(new Body(1.0e15, 1.1e7, 2.682e12, 0.967, 162.3 * C.A2PI, 0));
+        sun.addMoon(new Body(1.0e15, 1.1e7, 2.68529e12, 0.967, 162.3 * C.A2PI, 0));
         let earth = sun.moons[2];
         let moon = new Body(7.342e22, 1.738e6, 3.8443e9, 0.0549, 0, 0);
         earth.addMoon(moon);
 
         this.body = sun;
         this.body.paint(this.scene, this.time);
+        
         this.animate()
     }
 

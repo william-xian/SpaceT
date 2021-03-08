@@ -21,7 +21,7 @@ export class Body {
         this.e = e; //离心率
         this.b = Math.sqrt(1 - e * e) * a; //轨道短半轴
         this.c = e * this.a;
-        this.k = 4 * Math.PI * Math.PI / C.G * m;
+        this.k = 4 * Math.PI * Math.PI / (C.G * m);
         this.t = 0;
         this.orbitTheta = orbitTheta; // 轨道与黄道面夹角
         this.orbitPhi = orbitPhi;
