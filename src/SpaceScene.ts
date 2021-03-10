@@ -53,8 +53,7 @@ export default class SpaceScene {
         console.log(window.document.baseURI.toString());
         if (window.document.baseURI.toString().endsWith("?a=1")) {
             this.camera.position.set(0, 0, 0);
-            C.fRadius = [10,100,10];
-            this.camera.rotateX(Math.PI / 2);
+            C.fRadius = [10, 100, 10];
             earth.body.add(this.camera)
         }
         this.body = sun;
@@ -129,6 +128,13 @@ export default class SpaceScene {
     private render() {
         this.body.repaint(this.scene, this.time);
         this.time++;
+        if (window.document.baseURI.toString().endsWith("?a=1")) {
+            let mp = this.body.moons[0].body.position;
+            let ep = this.body.moons[2].body.position;
+            let lp = new Vector3(mp.x - ep.x, mp.y - ep.y, mp.z - mp.z);
+            this.camera.lookAt(lp);
+            this.camera.rotateZ(Math.PI / 2);
+        }
         this.renderer.render(this.scene, this.camera)
     }
     private animate = () => {
