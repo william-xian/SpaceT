@@ -3,8 +3,7 @@ import { C } from './C'
 
 export class Body {
     static color = 0;
-    mother: Body
-    lastMP: THREE.Vector3;
+    mother: Body;
     m: number; r: number; a: number; e: number; orbitTheta: number; orbitPhi: number;
     k: number; b: number; c: number; t: number;
     alphaT: Array<number>;
@@ -26,7 +25,7 @@ export class Body {
         this.orbitTheta = orbitTheta; // 轨道与黄道面夹角
         this.orbitPhi = orbitPhi;
         this.moons = []; //卫星
-        this.body = null;
+        this.body = new THREE.Group();
         this.orbit = null;
         this.orbitMtr = null;
     }
@@ -61,7 +60,7 @@ export class Body {
     private init() {
         let a = this.a;
         let b = this.b;
-        let n = 3600;
+        let n = 36000;
         let s = 2 * Math.PI * a * b / n;
         this.alphaT = [];
 
@@ -73,7 +72,7 @@ export class Body {
         let colors = [0xFFD700, 0xFF1493, 0xF0E68C, 0x8470FF, 0x00FF7F, 0x008000, 0x00FA9A];
         let color = colors[Body.color % colors.length]
         Body.color += 1;
-        this.body = this.createSphere(this.r, color);
+        this.body.add(this.createSphere(this.r, color));
     }
 
     private getAlpha(time: number) {
@@ -147,23 +146,14 @@ export class Body {
         scene.add(this.body);
         if (this.mother) {
             this.orbit = this.createOrbit();
-            this.lastMP = this.mother.body.position;
-            let mtr = new THREE.Matrix4();
-            let p = this.lastMP;
-            mtr.set(
-                1, 0, 0, p.x,
-                0, 1, 0, p.y,
-                0, 0, 1, p.z,
-                0, 0, 0, 1);
-            this.orbit.applyMatrix(mtr);
-            scene.add(this.orbit);
-
+            this.mother.body.add(this.orbit);
             let alpha = this.getAlpha(time);
             let a = this.a;
             let b = this.b;
             const mbp = this.mother.body.position;
             let cosA = Math.cos(alpha);
             let sinA = Math.sin(alpha);
+
             this.body.position.x = cosA * a;
             this.body.position.y = sinA * b;
             this.body.position.z = 0;
@@ -184,18 +174,7 @@ export class Body {
         let c = this.c;
         let mbp = new THREE.Vector3(0, 0, 0);
         if (this.mother) {
-            mbp = this.mother.body.position
-            let mtr = new THREE.Matrix4();
-            let oldP = this.lastMP;
-            let newP = this.mother.body.position;
-            this.lastMP = new THREE.Vector3(newP.x, newP.y, newP.z);
-            mtr.set(
-                1, 0, 0, newP.x - oldP.x,
-                0, 1, 0, newP.y - oldP.y,
-                0, 0, 1, newP.z - oldP.z,
-                0, 0, 0, 1);
-            this.orbit.applyMatrix(mtr);
-
+            mbp = this.mother.body.position;
             let cosA = Math.cos(alpha);
             let sinA = Math.sin(alpha);
             this.body.position.x = cosA * a;

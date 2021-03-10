@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { Vector3 } from "three"
 import { Body } from "./Body"
 import { C } from './C'
 export default class SpaceScene {
@@ -8,23 +9,16 @@ export default class SpaceScene {
     leftPressed: boolean
     body: Body
     time: number;
-    alpha: number;
-    beta: number;
     constructor() {
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1.0e0, 1.0e100)
         this.renderer = new THREE.WebGLRenderer()
         this.leftPressed = false;
         this.time = 0;
-        this.alpha = 0;
-        this.beta = 0;
         this.init()
     }
     private init() {
-        this.camera.position.set(0, 0, -4.60e11)
-        this.alpha = Math.PI / 2;
-        this.beta = Math.PI / 2;
-        this.updateLookAt();
+        this.camera.position.set(0, 0, 4.60e11);
         this.renderer.setClearColor(0x222222)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
@@ -58,20 +52,11 @@ export default class SpaceScene {
         sun.addMoon(new Body(1.0247e26, 2.4764e7, 4.50e12, 0.017, 1.770 * C.A2PI, 0));
         sun.addMoon(new Body(1.0e15, 1.1e7, 2.68529e12, 0.967, 162.3 * C.A2PI, 0));
         let earth = sun.moons[2];
-        let moon = new Body(7.342e22, 1.738e6, 3.8443e9, 0.0549, 0, 0);
+        let moon = new Body(7.342e22, 1.738e6, 3.8443e8, 0.0549, 0, 0);
         earth.addMoon(moon);
-
         this.body = sun;
         this.body.paint(this.scene, this.time);
-        
         this.animate()
-    }
-
-    private updateLookAt() {
-        let cp = this.camera.position;
-        let unit = 1.0e4;
-        let lookPoint = new THREE.Vector3(Math.cos(this.beta) * Math.cos(this.alpha) * unit + cp.x, Math.cos(this.beta) * Math.sin(this.alpha) * unit + cp.y, Math.sin(this.beta) * unit + cp.z);
-        this.camera.lookAt(lookPoint);
     }
 
     private onWindowResize = () => {
@@ -125,49 +110,54 @@ export default class SpaceScene {
     private onKeydown = (e: KeyboardEvent) => {
         console.log("onKeydown", e);
         const theta = Math.PI / 360;
-        let backForthX = Math.cos(this.beta) * Math.cos(this.alpha) * C.E;
-        let backForthY = Math.cos(this.beta) * Math.sin(this.alpha) * C.E;
-        let backForthZ = Math.sin(this.beta) * C.E;
-
-        let leftRighX = Math.sin(this.beta) * Math.sin(this.alpha) * C.E;
-        let leftRighY = Math.sin(this.beta) * Math.cos(this.alpha) * C.E;
-        let leftRighZ = Math.cos(this.beta) * C.E;
+        let dir = new Vector3();
+        this.camera.getWorldDirection(dir);
+        let r = Math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
+        let cosA = dir.x / r;
+        let sinA = dir.y / r;
+        let cosB = Math.sqrt(dir.x * dir.x + dir.y * dir.y) / r;
+        let sinB = dir.z / r;
+        let backForth = new Vector3(cosB * cosA * C.E, cosB * sinA * C.E, sinB * C.E);
+        let leftRigh = new Vector3(cosB * cosA * C.E, cosB * sinA * C.E, sinB * C.E);
+        let mtr = new THREE.Matrix3();
+        mtr.set(0, 0, -1, 0, 1, 0, 1, 0, 0);
+        leftRigh.applyMatrix3(mtr);
+        console.log(dir, leftRigh)
         switch (e.key) {
             case 'a':
-                this.camera.position.x -= leftRighX;
-                this.camera.position.y -= leftRighY;
-                this.camera.position.z -= leftRighZ;
+                this.camera.position.x -= leftRigh.x;
+                this.camera.position.y -= leftRigh.y;
+                this.camera.position.z -= leftRigh.z;
                 break;
             case 'd':
-                this.camera.position.x += leftRighX;
-                this.camera.position.y += leftRighY;
-                this.camera.position.z += leftRighZ;
+                this.camera.position.x += leftRigh.x;
+                this.camera.position.y += leftRigh.y;
+                this.camera.position.z += leftRigh.z;
                 break;
             case 'w':
-                this.camera.position.x += backForthX;
-                this.camera.position.y += backForthY;
-                this.camera.position.z += backForthZ;
+                this.camera.position.x += backForth.x;
+                this.camera.position.y += backForth.y;
+                this.camera.position.z += backForth.z;
                 break;
             case 's':
-                this.camera.position.x -= backForthX;
-                this.camera.position.y -= backForthY;
-                this.camera.position.z -= backForthZ;
+                this.camera.position.x -= backForth.x;
+                this.camera.position.y -= backForth.y;
+                this.camera.position.z -= backForth.z;
                 break;
             case 'i':
-                this.alpha += theta;
+                this.camera.rotateX(-theta);
                 break;
             case 'k':
-                this.alpha -= theta;
+                this.camera.rotateX(theta);
                 break;
             case 'j':
-                this.beta -= theta;
+                this.camera.rotateY(-theta);
                 break;
             case 'l':
-                this.beta += theta;
+                this.camera.rotateY(theta);
                 break;
             default:
         }
-        this.updateLookAt();
         this.camera.updateProjectionMatrix();
         this.renderer.render(this.scene, this.camera);
         console.log(this.camera.position);
