@@ -23,10 +23,6 @@ export default class SpaceScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight)
 
         window.addEventListener('resize', this.onWindowResize, false)
-        window.addEventListener('mousewheel', this.onMousewheel, false);
-        window.addEventListener('mousemove', this.onMousemove, false);
-        window.addEventListener('mousedown', this.onMousedown, false);
-        window.addEventListener('mouseup', this.onMouseup, false);
         window.addEventListener('keydown', this.onKeydown, false);
 
         let scene = document.getElementById('scene');
@@ -54,6 +50,13 @@ export default class SpaceScene {
         let earth = sun.moons[2];
         let moon = new Body(7.342e22, 1.738e6, 3.8443e8, 0.0549, 0, 0);
         earth.addMoon(moon);
+        console.log(window.document.baseURI.toString());
+        if (window.document.baseURI.toString().endsWith("?a=1")) {
+            this.camera.position.set(0, 0, 0);
+            C.fRadius = [10,100,10];
+            this.camera.rotateX(Math.PI / 2);
+            earth.body.add(this.camera)
+        }
         this.body = sun;
         this.body.paint(this.scene, this.time);
         this.animate()
@@ -64,22 +67,6 @@ export default class SpaceScene {
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
-    private onMousewheel = (e: WheelEvent) => {
-        if (e.deltaY > 0) {
-            this.scene.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 180);
-        } else {
-            this.scene.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 180);
-        }
-    }
-    private onMouseup = (e: MouseEvent) => {
-        console.log("onMouseup", e);
-        this.leftPressed = false;
-    }
-    private onMousedown = (e: MouseEvent) => {
-        console.log("onMousedown", e);
-        this.leftPressed = true;
-    }
-
     private onViewerTouchStart(e: TouchEvent) {
         console.log(e);
     }
@@ -100,49 +87,27 @@ export default class SpaceScene {
         console.log(e);
     }
 
-    private onMousemove = (e: MouseEvent) => {
-        if (this.leftPressed) {
-            this.scene.rotateOnAxis(new THREE.Vector3(0, 1, 0), e.movementX / window.innerWidth * 2);
-            this.scene.rotateOnAxis(new THREE.Vector3(1, 0, 0), e.movementY / window.innerHeight * 2);
-        }
-    }
-
     private onKeydown = (e: KeyboardEvent) => {
-        console.log("onKeydown", e);
         const theta = Math.PI / 360;
         let dir = new Vector3();
         this.camera.getWorldDirection(dir);
-        let r = Math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
-        let cosA = dir.x / r;
-        let sinA = dir.y / r;
-        let cosB = Math.sqrt(dir.x * dir.x + dir.y * dir.y) / r;
-        let sinB = dir.z / r;
-        let backForth = new Vector3(cosB * cosA * C.E, cosB * sinA * C.E, sinB * C.E);
-        let leftRigh = new Vector3(cosB * cosA * C.E, cosB * sinA * C.E, sinB * C.E);
         let mtr = new THREE.Matrix3();
         mtr.set(0, 0, -1, 0, 1, 0, 1, 0, 0);
+        let leftRigh = new Vector3();
+        this.camera.getWorldDirection(dir);
         leftRigh.applyMatrix3(mtr);
-        console.log(dir, leftRigh)
         switch (e.key) {
             case 'a':
-                this.camera.position.x -= leftRigh.x;
-                this.camera.position.y -= leftRigh.y;
-                this.camera.position.z -= leftRigh.z;
+                this.camera.translateOnAxis(leftRigh, C.E)
                 break;
             case 'd':
-                this.camera.position.x += leftRigh.x;
-                this.camera.position.y += leftRigh.y;
-                this.camera.position.z += leftRigh.z;
+                this.camera.translateOnAxis(leftRigh, -C.E)
                 break;
             case 'w':
-                this.camera.position.x += backForth.x;
-                this.camera.position.y += backForth.y;
-                this.camera.position.z += backForth.z;
+                this.camera.translateOnAxis(dir, C.E)
                 break;
             case 's':
-                this.camera.position.x -= backForth.x;
-                this.camera.position.y -= backForth.y;
-                this.camera.position.z -= backForth.z;
+                this.camera.translateOnAxis(dir, -C.E)
                 break;
             case 'i':
                 this.camera.rotateX(-theta);
@@ -160,7 +125,6 @@ export default class SpaceScene {
         }
         this.camera.updateProjectionMatrix();
         this.renderer.render(this.scene, this.camera);
-        console.log(this.camera.position);
     }
     private render() {
         this.body.repaint(this.scene, this.time);
