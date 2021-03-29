@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { C } from './C'
 
 export class Body {
-    static color = 0;
+    id: Array<number>;
     mother: Body;
     m: number; r: number; a: number; e: number; orbitTheta: number; orbitPhi: number;
     k: number; b: number; c: number; t: number;
@@ -12,6 +12,7 @@ export class Body {
     orbit: THREE.Object3D;
     orbitMtr: THREE.Matrix4;
     constructor(m: number, r: number, a: number, e: number, orbitTheta: number, orbitPhi: number) {
+        this.id = [];
         this.mother = null;
         this.alphaT = null;
         this.m = m; //质量
@@ -31,6 +32,8 @@ export class Body {
     }
     /**
      * 开普勒第2定理 面积定律行星和太阳的连线在相等的时间间隔内扫过相等的面积
+     * @param a 椭圆长半轴
+     * @param b 椭圆短半轴
      * @param alpah 中心角度
      * @returns 面积
      */
@@ -39,6 +42,13 @@ export class Body {
         return a * b * alpah - b * c * Math.sin(alpah)
     }
 
+    /**
+     * 
+     * @param area 行星从近日点运行扫过的面积
+     * @param a 椭圆长半轴
+     * @param b 椭圆短半轴
+     * @returns 夹角
+     */
     private static getAlpahByArea(area: number, a: number, b: number) {
         var h = Math.PI * 2;
         var l = 0;
@@ -68,11 +78,20 @@ export class Body {
             var alpha = Body.getAlpahByArea(i * s, a, b);
             this.alphaT.push(alpha);
         }
-        //let color = ((Body.color & 0x3) << 21) | (((Body.color >> 2) & 0x3) << 13) | (((Body.color >> 4) & 0x3) << 5);
-        let colors = [0xFFD700, 0xFF1493, 0xF0E68C, 0x8470FF, 0x00FF7F, 0x008000, 0x00FA9A];
-        let color = colors[Body.color % colors.length]
-        Body.color += 1;
-        this.body.add(this.createSphere(this.r, color));
+        var loader = new THREE.TextureLoader();
+        if (this.id.length == 0) {
+            loader.load('rs/sun-0.jpg', (texture: THREE.Texture) => {
+                this.body.add(this.createSphere(this.r, texture));
+            }, () => { }, () => {
+                this.body.add(this.createSphere(this.r, null));
+            });
+        } else {
+            loader.load('rs/sun-' + this.id.join('-') + '.jpg', (texture: THREE.Texture) => {
+                this.body.add(this.createSphere(this.r, texture));
+            }, () => { }, () => {
+                this.body.add(this.createSphere(this.r, null));
+            });
+        }
     }
 
     private getAlpha(time: number) {
@@ -85,13 +104,13 @@ export class Body {
     }
 
 
-    private createSphere(r: number, color: number) {
+    private createSphere(r: number, texture: THREE.Texture) {
         var i = 0;
         var p: Body = this;
         while (p.mother != null) { i++; p = p.mother };
         let f = (C.fRadius[i] | 1);
         var sphereGgeometry = new THREE.SphereGeometry(r * f, 32, 32);
-        var sphereMaterial = new THREE.MeshBasicMaterial({ color: color });
+        var sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, map: texture });
         var sphere = new THREE.Mesh(sphereGgeometry, sphereMaterial);
         return sphere;
     }
@@ -136,6 +155,8 @@ export class Body {
     }
 
     addMoon(body: Body) {
+        let id = this.moons.length + 1;
+        body.id = this.id.concat(id);
         this.moons.push(body);
         body.mother = this;
         body.t = Math.sqrt(this.k * body.a * body.a * body.a)

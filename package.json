@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/three": "^0.93.31",
     "css-loader": "^2.1.1",
+    "html-loader": "^2.1.2",
     "html-webpack-plugin": "^3.2.0",
     "import-three-examples": "^2.2.3",
     "style-loader": "^0.23.1",
