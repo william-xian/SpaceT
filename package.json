@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/scqilin/three.js-typescript#readme",
   "devDependencies": {
-    "@types/three": "^0.93.31",
     "css-loader": "^2.1.1",
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^3.2.0",
@@ -37,7 +36,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^17.3.0",
-    "three": "^0.102.1",
-    "three-orbitcontrols": "^2.102.1"
+    "@types/three": "^0.136.1",
+    "three": "^0.136.0"
   }
 }

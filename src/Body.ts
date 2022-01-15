@@ -80,13 +80,13 @@ export class Body {
         }
         var loader = new THREE.TextureLoader();
         if (this.id.length == 0) {
-            loader.load('rs/sun-0.jpg', (texture: THREE.Texture) => {
+            loader.load('rs/body-0.png', (texture: THREE.Texture) => {
                 this.body.add(this.createSphere(this.r, texture));
             }, () => { }, () => {
                 this.body.add(this.createSphere(this.r, null));
             });
         } else {
-            loader.load('rs/sun-' + this.id.join('-') + '.jpg', (texture: THREE.Texture) => {
+            loader.load('rs/body-' + this.id.join('-') + '.png', (texture: THREE.Texture) => {
                 this.body.add(this.createSphere(this.r, texture));
             }, () => { }, () => {
                 this.body.add(this.createSphere(this.r, null));
@@ -147,7 +147,7 @@ export class Body {
                 -sinP, cosP, 0, p.y,
                 sinT, 0, cosT, p.z,
                 0, 0, 0, 1);
-            geometry.applyMatrix(this.orbitMtr);
+            geometry.applyMatrix4(this.orbitMtr);
 
 
             return new THREE.LineSegments(geometry, material);
