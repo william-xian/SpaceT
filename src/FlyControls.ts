@@ -72,11 +72,11 @@ class FlyControls extends EventDispatcher {
 			case 'ShiftLeft':
 			case 'ShiftRight': this.movementSpeedMultiplier = 0.1; break;
 
-			case 'KeyW': this.moveState.back = -1e10; break;
+			case 'KeyW': this.moveState.forward = 1e10; break;
 			case 'KeyS': this.moveState.back = 1e10; break;
 
-			case 'KeyA': this.moveState.left = 1; break;
-			case 'KeyD': this.moveState.right = 1; break;
+			case 'KeyA': this.moveState.left = 1e10; break;
+			case 'KeyD': this.moveState.right = 1e10; break;
 
 			case 'KeyR': this.moveState.up = 1; break;
 			case 'KeyF': this.moveState.down = 1; break;
@@ -219,7 +219,7 @@ class FlyControls extends EventDispatcher {
 
 	updateMovementVector () {
 
-		const forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
+		const forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1e10 : 0;
 
 		this.moveVector.x = ( - this.moveState.left + this.moveState.right );
 		this.moveVector.y = ( - this.moveState.down + this.moveState.up );

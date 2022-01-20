@@ -5,7 +5,7 @@ export class Body {
     id: Array<number>;
     mother: Body|null;
     m: number; r: number; a: number; e: number; orbitTheta: number; orbitPhi: number;
-    k: number; b: number; c: number; t: number;
+    k: number; b: number; t: number;
     alphaT: Array<number>;
     moons: Array<Body>;
     body: THREE.Object3D;
@@ -21,7 +21,6 @@ export class Body {
         this.a = a; //轨道长半轴
         this.e = e; //离心率
         this.b = Math.sqrt(1 - e * e) * a; //轨道短半轴
-        this.c = e * this.a;
         this.k = 4 * Math.PI * Math.PI / (C.G * m);
         this.t = 0;
         this.orbitTheta = orbitTheta; // 轨道与黄道面夹角
@@ -79,7 +78,7 @@ export class Body {
             this.alphaT.push(alpha);
         }
         var loader = new THREE.TextureLoader();
-        if (this.id.length == 0) {
+        if (this.id.length === 0) {
             loader.load('rs/body-0.png', (texture: THREE.Texture) => {
                 this.body.add(this.createSphere(this.r, texture));
             }, () => { }, () => {
@@ -95,7 +94,7 @@ export class Body {
     }
 
     private getAlpha(time: number) {
-        if (this.t == 0) {
+        if (this.t === 0) {
             return 0;
         }
         let i = (time * C.TIME_UNIT) % this.t;
@@ -120,7 +119,7 @@ export class Body {
         var points = [];
         let a = this.a;
         let b = this.b;
-        let c = this.c;
+        let c = this.e * this.a;
         for (var i = 0; i < 360; i++) {
             var alpha = i * Math.PI * 2 / 360;
             let cosA = Math.cos(alpha);
@@ -187,7 +186,6 @@ export class Body {
         let alpha = this.getAlpha(time);
         let a = this.a;
         let b = this.b;
-        let c = this.c;
         let mbp = new THREE.Vector3(0, 0, 0);
         if (this.mother) {
             mbp = this.mother.body.position;
