@@ -9,7 +9,7 @@ export default class SpaceScene {
     renderer: THREE.WebGLRenderer;
     controls:FlyControls;
     leftPressed: boolean;
-    body: Body;
+    body: Body | undefined;
     time: number;
     constructor() {
         this.scene = new THREE.Scene()
@@ -17,7 +17,7 @@ export default class SpaceScene {
         this.renderer = new THREE.WebGLRenderer()
         this.leftPressed = false;
         this.time = 0;
-        let scene = document.getElementById('scene');
+        let scene:any = document.getElementById('scene');
         scene.appendChild(this.renderer.domElement);
         this.controls = new FlyControls(this.camera, scene)
         this.controls.update(this.time);
@@ -48,6 +48,7 @@ export default class SpaceScene {
         earth.addMoon(moon);
         sun.addMoon(new Body(1.0e15, 1.1e7, 2.68529e12, 0.967, 162.3 * C.A2PI, 0));
         earth.body.add(this.camera);
+        this.camera.position.set(0, 0, 6.371e6);
         this.camera.lookAt(0,0,0);
         this.body = sun;
         this.body.paint(this.scene, this.time);
@@ -60,14 +61,16 @@ export default class SpaceScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
     private render() {
-        this.body.repaint(this.scene, this.time);
-        this.time++;
-        if (window.document.baseURI.toString().endsWith("?a=1")) {
-            let mp = this.body.moons[0].body.position;
-            let ep = this.body.moons[2].body.position;
-            let lp = new Vector3(mp.x - ep.x, mp.y - ep.y, mp.z - mp.z);
-            this.camera.lookAt(lp);
-            this.camera.rotateZ(Math.PI / 2);
+        if(this.body) {
+            this.body.repaint(this.scene, this.time);
+            this.time++;
+            if (window.document.baseURI.toString().endsWith("?a=1")) {
+                let mp = this.body.moons[0].body.position;
+                let ep = this.body.moons[2].body.position;
+                let lp = new Vector3(mp.x - ep.x, mp.y - ep.y, mp.z - mp.z);
+                this.camera.lookAt(lp);
+                this.camera.rotateZ(Math.PI / 2);
+            }
         }
         this.renderer.render(this.scene, this.camera)
     }

@@ -3,18 +3,19 @@ import { C } from './C'
 
 export class Body {
     id: Array<number>;
-    mother: Body;
+    mother: Body|null;
     m: number; r: number; a: number; e: number; orbitTheta: number; orbitPhi: number;
     k: number; b: number; c: number; t: number;
     alphaT: Array<number>;
     moons: Array<Body>;
     body: THREE.Object3D;
-    orbit: THREE.Object3D;
+    orbit: THREE.Object3D|null;
     orbitMtr: THREE.Matrix4;
     constructor(m: number, r: number, a: number, e: number, orbitTheta: number, orbitPhi: number) {
         this.id = [];
         this.mother = null;
-        this.alphaT = null;
+        this.orbit = null;
+        this.alphaT = [];
         this.m = m; //质量
         this.r = r; //半径
         this.a = a; //轨道长半轴
@@ -27,8 +28,7 @@ export class Body {
         this.orbitPhi = orbitPhi;
         this.moons = []; //卫星
         this.body = new THREE.Group();
-        this.orbit = null;
-        this.orbitMtr = null;
+        this.orbitMtr = new THREE.Matrix4();
     }
     /**
      * 开普勒第2定理 面积定律行星和太阳的连线在相等的时间间隔内扫过相等的面积
@@ -104,7 +104,7 @@ export class Body {
     }
 
 
-    private createSphere(r: number, texture: THREE.Texture) {
+    private createSphere(r: number, texture: THREE.Texture|null) {
         var i = 0;
         var p: Body = this;
         while (p.mother != null) { i++; p = p.mother };
@@ -116,42 +116,37 @@ export class Body {
     }
 
     private createOrbit() {
-        if (this.mother) {
-            const material = new THREE.MeshBasicMaterial({ color: 0x808080 });
-            var points = [];
-            let a = this.a;
-            let b = this.b;
-            let c = this.c;
-            for (var i = 0; i < 360; i++) {
-                var alpha = i * Math.PI * 2 / 360;
-                let cosA = Math.cos(alpha);
-                let sinA = Math.sin(alpha);
-                points.push(new THREE.Vector3(cosA * a, sinA * b, 0));
-            }
-            points.push(points[0]);
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            let cosT = Math.cos(this.orbitTheta);
-            let sinT = Math.sin(this.orbitTheta);
-            let cosP = Math.cos(this.orbitPhi);
-            let sinP = Math.sin(this.orbitPhi);
-            this.orbitMtr = new THREE.Matrix4();
-            this.orbitMtr.set(
-                cosT * cosP, sinP, -sinT, 0,
-                -sinP, cosP, 0, 0,
-                sinT, 0, cosT, 0,
-                0, 0, 0, 1);
-            let p = new THREE.Vector3(-c, 0, 0);
-            p.applyMatrix4(this.orbitMtr);
-            this.orbitMtr.set(
-                cosT * cosP, sinP, -sinT, p.x,
-                -sinP, cosP, 0, p.y,
-                sinT, 0, cosT, p.z,
-                0, 0, 0, 1);
-            geometry.applyMatrix4(this.orbitMtr);
-
-
-            return new THREE.LineSegments(geometry, material);
+        const material = new THREE.MeshBasicMaterial({ color: 0x808080 });
+        var points = [];
+        let a = this.a;
+        let b = this.b;
+        let c = this.c;
+        for (var i = 0; i < 360; i++) {
+            var alpha = i * Math.PI * 2 / 360;
+            let cosA = Math.cos(alpha);
+            let sinA = Math.sin(alpha);
+            points.push(new THREE.Vector3(cosA * a, sinA * b, 0));
         }
+        points.push(points[0]);
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        let cosT = Math.cos(this.orbitTheta);
+        let sinT = Math.sin(this.orbitTheta);
+        let cosP = Math.cos(this.orbitPhi);
+        let sinP = Math.sin(this.orbitPhi);
+        this.orbitMtr.set(
+            cosT * cosP, sinP, -sinT, 0,
+            -sinP, cosP, 0, 0,
+            sinT, 0, cosT, 0,
+            0, 0, 0, 1);
+        let p = new THREE.Vector3(-c, 0, 0);
+        p.applyMatrix4(this.orbitMtr);
+        this.orbitMtr.set(
+            cosT * cosP, sinP, -sinT, p.x,
+            -sinP, cosP, 0, p.y,
+            sinT, 0, cosT, p.z,
+            0, 0, 0, 1);
+        geometry.applyMatrix4(this.orbitMtr);
+        return new THREE.LineSegments(geometry, material);
     }
 
     addMoon(body: Body) {
@@ -160,14 +155,14 @@ export class Body {
         this.moons.push(body);
         body.mother = this;
         body.t = Math.sqrt(this.k * body.a * body.a * body.a)
+        body.orbit = body.createOrbit();
+        body.mother.body.add(body.orbit);
     }
 
     paint(scene: THREE.Scene, time: number) {
         this.init();
         scene.add(this.body);
-        if (this.mother) {
-            this.orbit = this.createOrbit();
-            this.mother.body.add(this.orbit);
+        if (this.mother) {        
             let alpha = this.getAlpha(time);
             let a = this.a;
             let b = this.b;

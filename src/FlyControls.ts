@@ -12,7 +12,6 @@ const lastQuaternion = new Quaternion();
 const lastPosition = new Vector3();
 
 class FlyControls extends EventDispatcher {
-
 	object:THREE.Object3D;
 	domElement:HTMLElement;
 	movementSpeed:number;
@@ -62,7 +61,7 @@ class FlyControls extends EventDispatcher {
 
 	}
 
-	keydown ( event ) {
+	keydown ( event:KeyboardEvent ) {
 
 		if ( event.altKey ) {
 
@@ -98,7 +97,7 @@ class FlyControls extends EventDispatcher {
 
 	}
 
-	keyup ( event ) {
+	keyup ( event:KeyboardEvent ) {
 
 		switch ( event.code ) {
 
@@ -130,7 +129,7 @@ class FlyControls extends EventDispatcher {
 
 	};
 
-	mousedown ( event ) {
+	mousedown ( event:MouseEvent ) {
 
 		if ( this.dragToLook ) {
 
@@ -151,7 +150,7 @@ class FlyControls extends EventDispatcher {
 
 	};
 
-	mousemove ( event ) {
+	mousemove ( event:MouseEvent ) {
 
 		if ( ! this.dragToLook || this.mouseStatus > 0 ) {
 
@@ -168,7 +167,7 @@ class FlyControls extends EventDispatcher {
 
 	};
 
-	mouseup ( event ) {
+	mouseup ( event:MouseEvent ) {
 
 		if ( this.dragToLook ) {
 
@@ -193,7 +192,7 @@ class FlyControls extends EventDispatcher {
 
 	};
 
-	update ( delta ) {
+	update ( delta:number ) {
 		const scope = this;
 		const moveMult = delta * scope.movementSpeed;
 		const rotMult = delta * scope.rollSpeed;
@@ -262,7 +261,7 @@ class FlyControls extends EventDispatcher {
 
 }
 
-function contextmenu( event ) {
+function contextmenu( event:any ) {
 
 	event.preventDefault();
 

@@ -1,42 +1,45 @@
 {
-  "name": "three.js-typescript",
-  "version": "1.0.0",
-  "description": "three.js-typescript",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config ./webpack.config.js --mode production",
-    "server": "webpack-dev-server --config ./webpack.config.js --mode development"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/scqilin/three.js-typescript.git"
-  },
-  "keywords": [
-    "three.js",
-    "typescript"
-  ],
-  "author": "qilin",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/scqilin/three.js-typescript/issues"
-  },
-  "homepage": "https://github.com/scqilin/three.js-typescript#readme",
-  "devDependencies": {
-    "css-loader": "^2.1.1",
-    "html-loader": "^2.1.2",
-    "html-webpack-plugin": "^3.2.0",
-    "import-three-examples": "^2.2.3",
-    "style-loader": "^0.23.1",
-    "ts-loader": "^5.3.3",
-    "typescript": "^3.3.3333",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.2.1"
-  },
+  "name": "space-t",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@tweenjs/tween.js": "^17.3.0",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^16.11.21",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
     "@types/three": "^0.136.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "5.0.0",
+    "typescript": "^4.5.4",
+    "web-vitals": "^2.1.3",
     "three": "^0.136.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

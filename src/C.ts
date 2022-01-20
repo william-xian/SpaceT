@@ -3,5 +3,5 @@ export class C {
     static E = 1.0e11;
     static A2PI = Math.PI / 180;
     static TIME_UNIT = 8.64e3
-    static fRadius = [10, 10, 10];
+    static fRadius = [1, 1, 1];
 }
