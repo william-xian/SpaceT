@@ -169,13 +169,14 @@ export class Body {
             let cosA = Math.cos(alpha);
             let sinA = Math.sin(alpha);
 
-            this.body.position.x = cosA * a;
-            this.body.position.y = sinA * b;
+            this.body.position.x = sinA * b;
+            this.body.position.y = cosA * a;
             this.body.position.z = 0;
             this.body.position.applyMatrix4(this.orbitMtr);
             this.body.position.x += mbp.x;
             this.body.position.y += mbp.y;
             this.body.position.z += mbp.z;
+            this.body.rotateX(-Math.PI/2)
         }
         this.moons.forEach((item: Body) => {
             item.paint(scene, time);
@@ -198,6 +199,9 @@ export class Body {
             this.body.position.x += mbp.x;
             this.body.position.y += mbp.y;
             this.body.position.z += mbp.z;
+            if(this.id[0] === 3){
+                this.body.rotateY(Math.PI/180)
+            }
         }
 
 

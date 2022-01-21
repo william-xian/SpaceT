@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
 import SpaceScene from './SpaceScene';
+import { Container, Content } from 'rsuite'
 
 class App extends React.Component {
   componentDidMount() {
@@ -8,8 +9,9 @@ class App extends React.Component {
   }
   render() {
     return (
-      <div id="scene">
-      </div>
+      <Container>
+        <Content><div id="scene"></div></Content>
+      </Container>
     );
   }
 }

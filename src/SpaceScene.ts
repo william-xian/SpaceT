@@ -47,7 +47,7 @@ export default class SpaceScene {
         let moon = new Body(7.342e22, 1.738e6, 3.8443e8, 0.0549, 0, 0);
         earth.addMoon(moon);
         sun.addMoon(new Body(1.0e15, 1.1e7, 2.68529e12, 0.967, 162.3 * C.A2PI, 0));
-        earth.body.add(this.camera);
+        this.scene.add(this.camera);
         this.camera.position.set(0, 0, 6.371e6);
         this.camera.lookAt(0,0,0);
         this.body = sun;
@@ -64,13 +64,6 @@ export default class SpaceScene {
         if(this.body) {
             this.body.repaint(this.scene, this.time);
             this.time++;
-            if (window.document.baseURI.toString().endsWith("?a=1")) {
-                let mp = this.body.moons[0].body.position;
-                let ep = this.body.moons[2].body.position;
-                let lp = new Vector3(mp.x - ep.x, mp.y - ep.y, mp.z - mp.z);
-                this.camera.lookAt(lp);
-                this.camera.rotateZ(Math.PI / 2);
-            }
         }
         this.renderer.render(this.scene, this.camera)
     }
