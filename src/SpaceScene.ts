@@ -3,6 +3,11 @@ import { Vector3 } from "three"
 import { Body } from "./Body"
 import { C } from './C'
 import { FlyControls } from "./FlyControls"
+
+
+const innerWidth = window.innerWidth;
+const innerHeight = window.innerHeight;
+
 export default class SpaceScene {
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
@@ -13,7 +18,7 @@ export default class SpaceScene {
     time: number;
     constructor() {
         this.scene = new THREE.Scene()
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1.0e0, 1.0e100)
+        this.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 1.0e0, 1.0e100)
         this.renderer = new THREE.WebGLRenderer()
         this.leftPressed = false;
         this.time = 0;
@@ -24,14 +29,35 @@ export default class SpaceScene {
         this.init()
     }
     private init() {
-        //this.camera.position.set(0, 0, 4.60e11);
+        this.camera.position.set(0, 0, 4.60e11);
         this.renderer.setClearColor(0x222222)
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.renderer.setSize(innerWidth, innerHeight)
 
 
         window.addEventListener('resize', this.onWindowResize, false)
+        this.body = this.createBody();
+        this.animate()
+    }
+    updateFRadius() {
+        this.scene.clear();
+        this.body = this.createBody();
+    }
 
+    updateCamera(bodyId:string) {
+        const ids = bodyId.split('-');
+        if(this.body && ids.length > 0) {
+            let target:Body = this.body;
+            for(let i = 1; i < ids.length; i++) {
+                let id = Number.parseInt(ids[i]) -1;
+                target = target.moons[id];
+            }
+            this.camera.parent?.remove(this.camera);
+            this.camera.position.set(0,0,0);
+            target.body.add(this.camera);
+        }
+    }
 
+    createBody() {
         let sun = new Body(1.9891e30, 6.96e8, 0, 0, 0, 0);
 
         sun.addMoon(new Body(3.3022e23, 2.44e6, 5.79e10, 0, 7.005 * C.A2PI, 0));
@@ -47,18 +73,15 @@ export default class SpaceScene {
         let moon = new Body(7.342e22, 1.738e6, 3.8443e8, 0.0549, 0, 0);
         earth.addMoon(moon);
         sun.addMoon(new Body(1.0e15, 1.1e7, 2.68529e12, 0.967, 162.3 * C.A2PI, 0));
-        this.scene.add(this.camera);
-        this.camera.position.set(0, 0, 6.371e6);
-        this.camera.lookAt(0,0,0);
-        this.body = sun;
-        this.body.paint(this.scene, this.time);
-        this.animate()
+        
+        sun.paint(this.scene, this.time);
+        return sun;
     }
 
     private onWindowResize = () => {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.aspect = innerWidth / innerHeight;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(innerWidth, innerHeight);
     }
     private render() {
         if(this.body) {

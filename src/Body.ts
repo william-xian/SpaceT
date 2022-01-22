@@ -12,7 +12,7 @@ export class Body {
     orbit: THREE.Object3D|null;
     orbitMtr: THREE.Matrix4;
     constructor(m: number, r: number, a: number, e: number, orbitTheta: number, orbitPhi: number) {
-        this.id = [];
+        this.id = [1];
         this.mother = null;
         this.orbit = null;
         this.alphaT = [];
@@ -78,19 +78,12 @@ export class Body {
             this.alphaT.push(alpha);
         }
         var loader = new THREE.TextureLoader();
-        if (this.id.length === 0) {
-            loader.load('rs/body-0.png', (texture: THREE.Texture) => {
-                this.body.add(this.createSphere(this.r, texture));
-            }, () => { }, () => {
-                this.body.add(this.createSphere(this.r, null));
-            });
-        } else {
-            loader.load('rs/body-' + this.id.join('-') + '.png', (texture: THREE.Texture) => {
-                this.body.add(this.createSphere(this.r, texture));
-            }, () => { }, () => {
-                this.body.add(this.createSphere(this.r, null));
-            });
-        }
+        
+        loader.load('rs/body-' + this.id.join('-') + '.png', (texture: THREE.Texture) => {
+            this.body.add(this.createSphere(this.r, texture));
+        }, () => { }, () => {
+            this.body.add(this.createSphere(this.r, null));
+        });
     }
 
     private getAlpha(time: number) {
